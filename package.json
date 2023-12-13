@@ -28,7 +28,8 @@
         "test:report-gas": "REPORT_GAS=true hardhat test",
         "test:coverage": "hardhat coverage",
         "typechain": "hardhat typechain",
-        "prepublish": "tar -czf files.tgz .gitignore"
+        "prepublish": "tar -czf files.tgz .gitignore",
+        "get-group-id": "hardhat run scripts/get-group-id.ts"
     },
     "devDependencies": {
         "@ethersproject/abi": "^5.4.7",

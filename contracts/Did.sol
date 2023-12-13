@@ -16,7 +16,7 @@ contract Did {
 
     constructor(address semaphoreAddress, uint256 _groupId) {
         if (semaphoreAddress == address(0)) {
-            return ZeroAddress();
+            revert ZeroAddress();
         }
 
         semaphore = ISemaphore(semaphoreAddress);
@@ -27,7 +27,7 @@ contract Did {
 
     function addToGroup(uint256 identityCommitment) external {
         if (identityCommitment == 0) {
-            return ZeroIdentityCommitment();
+            revert ZeroIdentityCommitment();
         }
 
         semaphore.addMember(groupId, identityCommitment);
@@ -37,12 +37,12 @@ contract Did {
         external
     {
         if (did == 0 || merkleTreeRoot == 0 || nullifierHash == 0) {
-            return EitherZeroDidRootNullifierHash();
+            revert EitherZeroDidRootNullifierHash();
         }
 
         for (uint256 i = 0; i < proof.length; i++) {
             if (proof[i] == 0) {
-                return ZeroProof();
+                revert ZeroProof();
             }
         }
 

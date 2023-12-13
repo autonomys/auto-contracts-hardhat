@@ -13,70 +13,75 @@ import "./tasks/deploy";
 dotenvConfig();
 
 function getNetworks(): NetworksUserConfig {
-  if (!process.env.INFURA_API_KEY || !process.env.ETHEREUM_PRIVATE_KEY) {
-    return {};
-  }
+    if (
+        !process.env.INFURA_API_KEY ||
+        !process.env.ETHEREUM_PRIVATE_KEY ||
+        !process.env.NOVA_RPC_URL
+    ) {
+        return {};
+    }
 
-  const accounts = [`0x${process.env.ETHEREUM_PRIVATE_KEY}`];
-  const infuraApiKey = process.env.INFURA_API_KEY;
+    const accounts = [`0x${process.env.ETHEREUM_PRIVATE_KEY}`];
+    const infuraApiKey = process.env.INFURA_API_KEY;
+    const novaRpcUrl = process.env.NOVA_RPC_URL;
 
-  return {
-    goerli: {
-      url: `https://goerli.infura.io/v3/${infuraApiKey}`,
-      chainId: 5,
-      accounts,
-    },
-    sepolia: {
-      url: `https://sepolia.infura.io/v3/${infuraApiKey}`,
-      chainId: 11155111,
-      accounts,
-    },
-    mumbai: {
-      url: `https://polygon-mumbai.infura.io/v3/${infuraApiKey}`,
-      chainId: 80001,
-      accounts,
-    },
-    "optimism-goerli": {
-      url: `https://optimism-goerli.infura.io/v3/${infuraApiKey}`,
-      chainId: 420,
-      accounts,
-    },
-    arbitrum: {
-      url: `https://arbitrum-mainnet.infura.io/v3/${infuraApiKey}`,
-      chainId: 42161,
-      accounts,
-    },
-    nova: {
-      url: `https://nova.gemini-3g.subspace.network/ws`,
-      chainId: 1002,
-      accounts,
-    },
-  };
+    return {
+        goerli: {
+            url: `https://goerli.infura.io/v3/${infuraApiKey}`,
+            chainId: 5,
+            accounts,
+        },
+        sepolia: {
+            url: `https://sepolia.infura.io/v3/${infuraApiKey}`,
+            chainId: 11155111,
+            accounts,
+        },
+        mumbai: {
+            url: `https://polygon-mumbai.infura.io/v3/${infuraApiKey}`,
+            chainId: 80001,
+            accounts,
+        },
+        "optimism-goerli": {
+            url: `https://optimism-goerli.infura.io/v3/${infuraApiKey}`,
+            chainId: 420,
+            accounts,
+        },
+        arbitrum: {
+            url: `https://arbitrum-mainnet.infura.io/v3/${infuraApiKey}`,
+            chainId: 42161,
+            accounts,
+        },
+        nova: {
+            url: `${novaRpcUrl}`,
+            chainId: 1002,
+            accounts,
+        },
+    };
 }
 
 const hardhatConfig: HardhatUserConfig = {
-  solidity: config.solidity,
-  paths: {
-    sources: config.paths.contracts,
-    tests: config.paths.tests,
-    cache: config.paths.cache,
-    artifacts: config.paths.build.contracts,
-  },
-  networks: {
-    hardhat: {
-      chainId: 1337,
+    solidity: config.solidity,
+    paths: {
+        sources: config.paths.contracts,
+        tests: config.paths.tests,
+        cache: config.paths.cache,
+        artifacts: config.paths.build.contracts,
     },
-    ...getNetworks(),
-  },
-  gasReporter: {
-    currency: "USD",
-    enabled: process.env.REPORT_GAS === "true",
-    coinmarketcap: process.env.COINMARKETCAP_API_KEY,
-  },
-  typechain: {
-    outDir: config.paths.build.typechain,
-    target: "ethers-v5",
-  },
+    networks: {
+        hardhat: {
+            chainId: 1337,
+        },
+        ...getNetworks(),
+    },
+    gasReporter: {
+        currency: "USD",
+        enabled: process.env.REPORT_GAS === "true",
+        coinmarketcap: process.env.COINMARKETCAP_API_KEY,
+    },
+    typechain: {
+        outDir: config.paths.build.typechain,
+        target: "ethers-v5",
+    },
 };
 
 export default hardhatConfig;
