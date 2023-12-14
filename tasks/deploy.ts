@@ -1,6 +1,6 @@
 import { task, types } from "hardhat/config";
 
-task("deploy", "Deploy a Did contract")
+task("deploy", "Deploy a DidRegistry contract")
     .addOptionalParam(
         "semaphore",
         "Semaphore contract address",
@@ -26,7 +26,7 @@ task("deploy", "Deploy a Did contract")
                 groupId = process.env.GROUP_ID;
             }
 
-            const DidFactory = await ethers.getContractFactory("Did");
+            const DidFactory = await ethers.getContractFactory("DidRegistry");
 
             const didContract = await DidFactory.deploy(
                 semaphoreAddress,
@@ -37,7 +37,7 @@ task("deploy", "Deploy a Did contract")
 
             if (logs) {
                 console.info(
-                    `Did contract has been deployed to: ${didContract.address}`
+                    `DidRegistry contract has been deployed to: ${didContract.address}`
                 );
             }
 

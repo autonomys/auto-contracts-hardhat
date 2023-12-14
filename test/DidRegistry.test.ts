@@ -5,11 +5,12 @@ import { expect } from "chai";
 import { formatBytes32String } from "ethers/lib/utils";
 import { run } from "hardhat";
 // @ts-ignore: typechain folder will be generated after contracts compilation
-import { Did } from "../build/typechain";
+import { DidRegistry } from "../build/typechain";
 import { config } from "../package.json";
+import { now } from "../scripts/utils";
 
-describe("Did", () => {
-    let didContract: Did;
+describe("DidRegistry", () => {
+    let didContract: DidRegistry;
     let semaphoreContract: string;
 
     const groupId = "111";
@@ -53,7 +54,7 @@ describe("Did", () => {
         const zkeyFilePath = `${config.paths.build["snark-artifacts"]}/semaphore.zkey`;
 
         it("Should allow users to send did anonymously", async () => {
-            const did = formatBytes32String("Auto DID");
+            const did = formatBytes32String(`Auto DID${now()}`);
 
             const fullProof = await generateProof(
                 users[1],

@@ -1,10 +1,10 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
-import "@semaphore-protocol/contracts/interfaces/ISemaphore.sol";
+import "./IDidRegistry.sol";
 
-contract Did {
-    ISemaphore public semaphore;
+contract DidRegistry {
+    IDidRegistry public semaphore;
 
     uint256 public groupId;
 
@@ -19,11 +19,23 @@ contract Did {
             revert ZeroAddress();
         }
 
-        semaphore = ISemaphore(semaphoreAddress);
+        semaphore = IDidRegistry(semaphoreAddress);
         groupId = _groupId;
 
         semaphore.createGroup(groupId, 20, address(this));
     }
+
+    // ======== Getters =========
+
+    function getMerkleTreeRoot() public view returns (uint256) {
+        return semaphore.getMerkleTreeRoot(groupId);
+    }
+
+    function getMerkleTreeDepth() external view returns (uint256) {
+        return semaphore.getMerkleTreeDepth(groupId);
+    }
+
+    // ======== Setters =========
 
     function addToGroup(uint256 identityCommitment) external {
         if (identityCommitment == 0) {

@@ -1,5 +1,5 @@
 /**
- * This script gets the group ID of the DID Registry contract deployed on Nova
+ * Add a user to a group on Nova using the DID Registry contract
  */
 import { ethers } from "hardhat";
 import { Wallet, ContractFactory } from "ethers";
@@ -9,6 +9,9 @@ import { isContractAddress, readContractAddress } from "./utils";
 const NOVA_RPC_URL = process.env.NOVA_RPC_URL;
 const ETHEREUM_PRIVATE_KEY = process.env.ETHEREUM_PRIVATE_KEY;
 const CONFIG_FILE_PATH = "./deployed-subspace-nova.json"; // Configurable file path
+// sample identity commitment
+const identityCommitment: string =
+    "3402491063641188553099014319222343207263900714890504248764214888322143657035";
 
 function validateEnv() {
     if (!ETHEREUM_PRIVATE_KEY || !NOVA_RPC_URL) {
@@ -46,9 +49,9 @@ async function main() {
         didRegistryAddress
     )) as DidRegistry;
 
-    // call the groupId getter function
-    const groupId = await didContract.groupId();
-    console.log(`Group ID: ${groupId}`);
+    // send the transaction to add the user to the group
+    const tx = await didContract.addToGroup(identityCommitment);
+    console.log(`Transaction hash: ${tx.hash}`);
 }
 
 main().catch((error) => {

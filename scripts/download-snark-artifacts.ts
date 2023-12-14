@@ -3,8 +3,9 @@ import fs from "fs"
 import { config } from "../package.json"
 
 async function main() {
+    const treeDepth = process.env.TREE_DEPTH || 20;
     const snarkArtifactsPath = config.paths.build["snark-artifacts"]
-    const url = `http://www.trusted-setup-pse.org/semaphore/${20}`
+    const url = `http://www.trusted-setup-pse.org/semaphore/${treeDepth}`
 
     if (!fs.existsSync(snarkArtifactsPath)) {
         fs.mkdirSync(snarkArtifactsPath, { recursive: true })

@@ -1,6 +1,6 @@
 # Auto Contracts Hardhat
 
-This is DID contract based on Semaphore. It comes with DID contract, a test for that contract and a task that deploys that contract.
+This is DID Registry contract based on Semaphore. It comes with DID Registry contract, a test for that contract and a task that deploys that contract.
 
 ## Usage
 

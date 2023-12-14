@@ -1,7 +1,7 @@
 {
-    "name": "@auto/did-contracts-hardhat",
+    "name": "@auto/did-registry-hardhat",
     "version": "3.15.1",
-    "description": "Auto DID Semaphore Contracts",
+    "description": "Auto DID Registry via Hardhat",
     "license": "MIT",
     "files": [
         "files.tgz",
@@ -29,7 +29,8 @@
         "test:coverage": "hardhat coverage",
         "typechain": "hardhat typechain",
         "prepublish": "tar -czf files.tgz .gitignore",
-        "get-group-id": "hardhat run scripts/get-group-id.ts"
+        "get-group-id": "hardhat run scripts/get-group-id.ts",
+        "add-to-group": "hardhat run scripts/add-to-group.ts"
     },
     "devDependencies": {
         "@ethersproject/abi": "^5.4.7",
