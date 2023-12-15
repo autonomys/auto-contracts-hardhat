@@ -52,3 +52,10 @@ yarn deploy --semaphore <semaphore-address> --group <group-id> --network nova
 
 > **Warning**  
 > The group id is a number!
+
+Or deploy contract with a new Semaphore contract.
+> This would cost extra gas fee because of 5 new deployments
+
+```bash
+yarn deploy-nova
+```

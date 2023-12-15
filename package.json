@@ -24,13 +24,15 @@
         "compile": "hardhat compile",
         "download:snark-artifacts": "hardhat run scripts/download-snark-artifacts.ts",
         "deploy": "yarn compile && hardhat deploy",
+        "deploy-nova": "yarn compile && hardhat deploy --network nova",
         "test": "hardhat run scripts/download-snark-artifacts.ts && hardhat test",
         "test:report-gas": "REPORT_GAS=true hardhat test",
         "test:coverage": "hardhat coverage",
         "typechain": "hardhat typechain",
         "prepublish": "tar -czf files.tgz .gitignore",
         "get-group-id": "hardhat run scripts/get-group-id.ts",
-        "add-to-group": "hardhat run scripts/add-to-group.ts"
+        "add-to-group": "hardhat run scripts/add-to-group.ts",
+        "verify-user": "hardhat run scripts/verify-user.ts"
     },
     "devDependencies": {
         "@ethersproject/abi": "^5.4.7",
@@ -47,10 +49,12 @@
         "@typechain/ethers-v5": "^10.1.0",
         "@typechain/hardhat": "^6.1.2",
         "@types/chai": "^4.2.0",
+        "@types/debug": "^4.1.12",
         "@types/download": "^8.0.1",
         "@types/mocha": "^9.1.0",
         "@types/node": ">=12.0.0",
         "chai": "^4.2.0",
+        "debug": "^4.3.4",
         "dotenv": "^16.0.3",
         "download": "^8.0.0",
         "ethers": "^5.4.7",
@@ -76,7 +80,8 @@
                 "snark-artifacts": "./build/snark-artifacts",
                 "contracts": "./build/contracts",
                 "typechain": "./build/typechain"
-            }
+            },
+            "abi": "./build/contracts/contracts/DidRegistry.sol/DidRegistry.json"
         }
     }
 }

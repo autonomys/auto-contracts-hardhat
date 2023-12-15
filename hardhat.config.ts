@@ -15,13 +15,13 @@ dotenvConfig();
 function getNetworks(): NetworksUserConfig {
     if (
         !process.env.INFURA_API_KEY ||
-        !process.env.ETHEREUM_PRIVATE_KEY ||
+        !process.env.DEPLOYER_PRIVATE_KEY ||
         !process.env.NOVA_RPC_URL
     ) {
         return {};
     }
 
-    const accounts = [`0x${process.env.ETHEREUM_PRIVATE_KEY}`];
+    const accounts = [`0x${process.env.DEPLOYER_PRIVATE_KEY}`];
     const infuraApiKey = process.env.INFURA_API_KEY;
     const novaRpcUrl = process.env.NOVA_RPC_URL;
 

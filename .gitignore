@@ -9,4 +9,7 @@ typechain-types
 cache
 artifacts
 build
+
 yarn-error.log
+
+.vscode

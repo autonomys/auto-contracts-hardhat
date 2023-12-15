@@ -8,6 +8,17 @@ contract DidRegistry {
 
     uint256 public groupId;
 
+    uint256 public userCount;
+
+    // Events
+    // NOTE: This event has been defined instead of relying on `MemberAdded` event in Semaphore contract
+    // because the `MemberAdded` event is for multiple groups in Semaphore contract.
+    // Hence, we would be able to filter the events for this contract only using `DidAdded` event.
+    // This info is required to form the group off-chain and to verify the membership of a user.
+    // We could also store (index, commitment) of each user in offchain DB. This would fasten the process
+    // skipping the need to filter the events which is a costly operation resource-wise (time & API server cost).
+    event DidAdded(uint256 indexed index, uint256 indexed identityCommitment);
+
     // Errors
     error ZeroAddress();
     error ZeroIdentityCommitment();
@@ -42,7 +53,11 @@ contract DidRegistry {
             revert ZeroIdentityCommitment();
         }
 
+        ++userCount;
+
         semaphore.addMember(groupId, identityCommitment);
+
+        emit DidAdded(userCount, identityCommitment);
     }
 
     function verifyMembership(uint256 did, uint256 merkleTreeRoot, uint256 nullifierHash, uint256[8] calldata proof)
