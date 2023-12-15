@@ -13,3 +13,7 @@ build
 yarn-error.log
 
 .vscode
+
+files.tgz
+
+.DS_Store
