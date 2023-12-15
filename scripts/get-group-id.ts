@@ -2,18 +2,22 @@
  * This script gets the group ID of the DID Registry contract deployed on Nova
  */
 import { ethers } from "hardhat";
-import { Wallet, ContractFactory } from "ethers";
-import { DidRegistry } from "../build/typechain";
+import { Contract } from "ethers";
 import { isContractAddress, readContractAddress } from "./utils";
 
+// Import the DidRegistry ABI from the JSON file
+import DidRegistryJson from "../build/contracts/contracts/DidRegistry.sol/DidRegistry.json";
+const abi = DidRegistryJson.abi;
+
 const NOVA_RPC_URL = process.env.NOVA_RPC_URL;
-const ETHEREUM_PRIVATE_KEY = process.env.ETHEREUM_PRIVATE_KEY;
-const CONFIG_FILE_PATH = "./deployed-subspace-nova.json"; // Configurable file path
+const SIGNER_PRIVATE_KEY = process.env.SIGNER_PRIVATE_KEY;
+// Configurable file path for the deployed contract address
+const CONFIG_FILE_PATH = "./deployed-subspace-nova.json";
 
 function validateEnv() {
-    if (!ETHEREUM_PRIVATE_KEY || !NOVA_RPC_URL) {
+    if (!SIGNER_PRIVATE_KEY || !NOVA_RPC_URL) {
         throw new Error(
-            "ETHEREUM_PRIVATE_KEY and NOVA_RPC_URL must be set in the .env file"
+            "SIGNER_PRIVATE_KEY and NOVA_RPC_URL must be set in the .env file"
         );
     }
 }
@@ -25,6 +29,7 @@ async function main() {
     // from "../deployed-subspace-nova.json".
     const didRegistryAddress: string = readContractAddress(CONFIG_FILE_PATH);
 
+    // client
     const provider = new ethers.providers.JsonRpcProvider(NOVA_RPC_URL);
 
     // check if the DID Registry contract address is a contract
@@ -34,20 +39,15 @@ async function main() {
         );
     }
 
-    const signer: Wallet = new Wallet(`0x${ETHEREUM_PRIVATE_KEY}`, provider);
-
-    const didContractFactory: ContractFactory = await ethers.getContractFactory(
-        "DidRegistry",
-        signer
+    // contract instance
+    const didRegistryContract: Contract = new ethers.Contract(
+        didRegistryAddress,
+        abi,
+        provider
     );
 
-    // instantiate the DID Registry contract instance via the address & provider
-    const didContract: DidRegistry = (await didContractFactory.attach(
-        didRegistryAddress
-    )) as DidRegistry;
-
     // call the groupId getter function
-    const groupId = await didContract.groupId();
+    const groupId = await didRegistryContract.groupId();
     console.log(`Group ID: ${groupId}`);
 }
 
