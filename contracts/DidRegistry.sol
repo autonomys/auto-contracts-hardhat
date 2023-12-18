@@ -10,6 +10,10 @@ contract DidRegistry {
 
     uint256 public userCount;
 
+    uint256 public queryFromBlockNum;
+
+    address public admin;
+
     // Events
     // NOTE: This event has been defined instead of relying on `MemberAdded` event in Semaphore contract
     // because the `MemberAdded` event is for multiple groups in Semaphore contract.
@@ -32,6 +36,7 @@ contract DidRegistry {
 
         semaphore = IDidRegistry(semaphoreAddress);
         groupId = _groupId;
+        admin = msg.sender;
 
         semaphore.createGroup(groupId, 20, address(this));
     }
@@ -46,7 +51,23 @@ contract DidRegistry {
         return semaphore.getMerkleTreeDepth(groupId);
     }
 
+    function getMembers() external view returns (uint256) {
+        return semaphore.getNumberOfMerkleTreeLeaves(groupId);
+    }
+
+    // ======== Modifiers =========
+    modifier onlyAdmin() {
+        require(msg.sender == admin, "Only admin can call this function");
+        _;
+    }
+
     // ======== Setters =========
+
+    /// @dev Set the queryFromBlockNum to the block number from which
+    /// the events should be queried.
+    function setQueryFromBlockNum(uint256 _queryFromBlockNum) external onlyAdmin {
+        queryFromBlockNum = _queryFromBlockNum;
+    }
 
     function addToGroup(uint256 identityCommitment) external {
         if (identityCommitment == 0) {

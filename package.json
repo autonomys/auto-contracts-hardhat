@@ -30,7 +30,7 @@
         "test:coverage": "hardhat coverage",
         "typechain": "hardhat typechain",
         "prepublish": "tar -czf files.tgz .gitignore",
-        "get-group-id": "hardhat run scripts/get-group-id.ts",
+        "get-registry-info": "hardhat run scripts/get-registry-info.ts",
         "add-to-group": "hardhat run scripts/add-to-group.ts",
         "verify-user": "hardhat run scripts/verify-user.ts",
         "is-user-verified": "hardhat run scripts/is-user-verified.ts"

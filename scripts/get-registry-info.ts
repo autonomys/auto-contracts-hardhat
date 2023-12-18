@@ -47,9 +47,24 @@ async function main() {
         provider
     );
 
+    // get the admin
+    const admin: string = await didRegistryContract.admin();
+    console.log(`Admin: ${admin}`);
+
     // call the groupId getter function
     const groupId: bigint = await didRegistryContract.groupId();
     console.log(`Group ID: ${groupId}`);
+
+    // call the members getter function
+    const members: bigint = await didRegistryContract.getMembers();
+    console.log(`Total members: ${members}`);
+
+    // call the merkle root getter function
+    const merkleRoot: string = await didRegistryContract.getMerkleTreeRoot();
+    console.log(`Merkle root: ${merkleRoot}`);
+
+    const mtDepth: bigint = await didRegistryContract.getMerkleTreeDepth();
+    console.log(`Merkle tree depth: ${mtDepth}`);
 }
 
 main().catch((error) => {
