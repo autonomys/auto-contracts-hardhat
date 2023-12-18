@@ -108,6 +108,8 @@ async function formGroup(
 }
 
 async function main() {
+    // Usage:
+    // $ DEBUG=verify-user  yarn verify-user
     let dbg = debug("verify-user");
 
     validateEnv();

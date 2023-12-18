@@ -3,7 +3,7 @@
  */
 import { ethers } from "hardhat";
 import { Contract } from "ethers";
-import { isContractAddress, readContractAddresses } from "./utils";
+import { isContractAddress, readDidRegistry } from "./utils";
 
 // Import the DidRegistry ABI from the JSON file
 import DidRegistryJson from "../build/contracts/contracts/DidRegistry.sol/DidRegistry.json";
@@ -27,8 +27,7 @@ async function main() {
 
     // after running `$ yarn hardhat deploy --network nova`, you can get the DID Registry address
     // from "../deployed-subspace-nova.json".
-    const didRegistryAddress: string =
-        readContractAddresses(CONFIG_FILE_PATH).DidRegistry;
+    const didRegistryAddress: string = readDidRegistry(CONFIG_FILE_PATH)[0];
 
     // client
     const provider = new ethers.providers.JsonRpcProvider(NOVA_RPC_URL);
@@ -54,6 +53,10 @@ async function main() {
     // call the groupId getter function
     const groupId: bigint = await didRegistryContract.groupId();
     console.log(`Group ID: ${groupId}`);
+
+    // get the block number when the contract was deployed
+    const blockNumber: bigint = await didRegistryContract.deployedBlockNumber();
+    console.log(`Deployed Block number: ${blockNumber}`);
 
     // call the members getter function
     const members: bigint = await didRegistryContract.getMembers();

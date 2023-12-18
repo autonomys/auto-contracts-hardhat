@@ -10,7 +10,7 @@ contract DidRegistry {
 
     uint256 public userCount;
 
-    uint256 public queryFromBlockNum;
+    uint256 public deployedBlockNumber;
 
     address public admin;
 
@@ -63,10 +63,10 @@ contract DidRegistry {
 
     // ======== Setters =========
 
-    /// @dev Set the queryFromBlockNum to the block number from which
+    /// @dev Set the deployedBlockNumber to the block number from which
     /// the events should be queried.
-    function setQueryFromBlockNum(uint256 _queryFromBlockNum) external onlyAdmin {
-        queryFromBlockNum = _queryFromBlockNum;
+    function setDeployedBlockNumber(uint256 _deployedBlockNumber) external onlyAdmin {
+        deployedBlockNumber = _deployedBlockNumber;
     }
 
     function addToGroup(uint256 identityCommitment) external {

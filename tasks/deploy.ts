@@ -37,7 +37,7 @@ task("deploy", "Deploy a DidRegistry contract")
 
             if (logs) {
                 console.info(
-                    `DidRegistry contract has been deployed to: ${didContract.address}`
+                    `DidRegistry contract has been deployed to: ${didContract.address} at tx hash: ${didContract.deployTransaction.hash}`
                 );
             }
 

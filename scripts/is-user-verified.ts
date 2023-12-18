@@ -13,7 +13,7 @@
 
 import { SemaphoreSubgraph, SemaphoreEthers } from "@semaphore-protocol/data";
 import { ethers } from "hardhat";
-import { readContractAddresses } from "./utils";
+import { readContractAddresses, readDidRegistry } from "./utils";
 import { Identity } from "@semaphore-protocol/identity";
 import { DidRegistry } from "../build/typechain";
 
@@ -39,8 +39,7 @@ async function main() {
 
     // after running `$ yarn hardhat deploy --network nova`, you can get the DID Registry address
     // from "../deployed-subspace-nova.json".
-    const didRegistryAddress: string =
-        readContractAddresses(CONFIG_FILE_PATH).DidRegistry;
+    const didRegistryAddress: string = readDidRegistry(CONFIG_FILE_PATH)[0];
     const semaphoreAddress: string =
         readContractAddresses(CONFIG_FILE_PATH).Semaphore;
 
@@ -67,7 +66,6 @@ async function main() {
 
     // get the group ID
     const groupId = await didRegistryContract.groupId();
-    console.log(`Group ID: ${groupId}`);
 
     // sample user commitment for testing
     let user = new Identity();

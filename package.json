@@ -25,6 +25,7 @@
         "download:snark-artifacts": "hardhat run scripts/download-snark-artifacts.ts",
         "deploy": "yarn compile && hardhat deploy",
         "deploy-nova": "yarn compile && hardhat deploy --network nova",
+        "post-deploy-nova": "yarn compile && hardhat run scripts/postDeploy.ts",
         "test": "hardhat run scripts/download-snark-artifacts.ts && hardhat test",
         "test:report-gas": "REPORT_GAS=true hardhat test",
         "test:coverage": "hardhat coverage",

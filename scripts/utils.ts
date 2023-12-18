@@ -35,7 +35,10 @@ interface ContractAddresses {
     Poseidon: string;
     IncrementalBinaryTree: string;
     Semaphore: string;
-    DidRegistry: string;
+    DidRegistry: {
+        address: string;
+        txHash: string;
+    };
 }
 
 /**
@@ -50,6 +53,17 @@ export function readContractAddresses(filePath: string): ContractAddresses {
         const rawData = readFileSync(filePath, { encoding: "utf8" });
         const data: ContractAddresses = JSON.parse(rawData);
         return data;
+    } catch (error) {
+        throw new Error(`Error reading the JSON file: ${error}`);
+    }
+}
+
+export function readDidRegistry(filePath: string): [string, string] {
+    try {
+        const rawData = readFileSync(filePath, { encoding: "utf8" });
+        const data: ContractAddresses = JSON.parse(rawData);
+
+        return [data.DidRegistry.address, data.DidRegistry.txHash];
     } catch (error) {
         throw new Error(`Error reading the JSON file: ${error}`);
     }
