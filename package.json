@@ -32,7 +32,8 @@
         "prepublish": "tar -czf files.tgz .gitignore",
         "get-group-id": "hardhat run scripts/get-group-id.ts",
         "add-to-group": "hardhat run scripts/add-to-group.ts",
-        "verify-user": "hardhat run scripts/verify-user.ts"
+        "verify-user": "hardhat run scripts/verify-user.ts",
+        "is-user-verified": "hardhat run scripts/is-user-verified.ts"
     },
     "devDependencies": {
         "@ethersproject/abi": "^5.4.7",
@@ -66,7 +67,8 @@
         "typescript": ">=4.5.0"
     },
     "dependencies": {
-        "@semaphore-protocol/contracts": "3.15.1"
+        "@semaphore-protocol/contracts": "3.15.1",
+        "@semaphore-protocol/data": "^3.15.1"
     },
     "config": {
         "solidity": {

@@ -2,7 +2,7 @@
  * Utility functions
  */
 
-import { ethers } from "ethers";
+import { Contract, ethers } from "ethers";
 import { ethers as ethersHardhat } from "hardhat";
 import { readFileSync } from "fs";
 
@@ -39,20 +39,19 @@ interface ContractAddresses {
 }
 
 /**
- * Reads the contract address from a JSON file.
+ * Reads the contract addresses from a JSON file.
  *
  * @param filePath - The path to the JSON file.
  * @returns The contract address as string.
  * @throws Error if there is an error reading the JSON file.
  */
-export function readContractAddress(filePath: string): string {
+export function readContractAddresses(filePath: string): ContractAddresses {
     try {
         const rawData = readFileSync(filePath, { encoding: "utf8" });
         const data: ContractAddresses = JSON.parse(rawData);
-        return data.DidRegistry;
+        return data;
     } catch (error) {
-        console.error("Error reading the JSON file:", error);
-        throw error; // or handle the error as you see fit
+        throw new Error(`Error reading the JSON file: ${error}`);
     }
 }
 
