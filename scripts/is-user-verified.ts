@@ -3,6 +3,7 @@
  * The script runs the check off-chain. Just collecting some info from the Nova chain.
  * So, no gas fees for this.
  *
+ * Two approaches followed to check if the user is in the group [From Semaphore docs]:
  * FIXME: [SemaphoreSubgraph] This script is not working as expected. This is because the Semaphore subgraph
  *      may not be configured for Nova network.
  *      Solution: Use `SemaphoreEthers` instead of `SemaphoreSubgraph`.
@@ -19,6 +20,7 @@ import { DidRegistry } from "../build/typechain";
 
 // Import the DidRegistry ABI from the JSON file
 import DidRegistryJson from "../build/contracts/contracts/DidRegistry.sol/DidRegistry.json";
+import { BigNumberish } from "ethers";
 const abi = DidRegistryJson.abi;
 
 const NOVA_RPC_URL = process.env.NOVA_RPC_URL;
@@ -51,21 +53,23 @@ async function main() {
     //     "https://nova.squid.gemini-3g.subspace.network/graphql"
     // );
 
-    // Using `SemaphoreEthers`
-    const semaphoreEthers = new SemaphoreEthers(NOVA_RPC_URL, {
-        address: semaphoreAddress,
-        // TODO: decide this? It has to be the block where `semaphoreAddress` was used to deploy the contract.
-        startBlock: 362702,
-    });
-
-    const didRegistryContract = new ethers.Contract(
+    const didRegistryContract: DidRegistry = new ethers.Contract(
         didRegistryAddress,
         abi,
         provider
     ) as DidRegistry;
 
+    // get the deployedBlockNumber from the contract
+    const deployedBlockNumber = await didRegistryContract.deployedBlockNumber();
+
+    // Using `SemaphoreEthers`
+    const semaphoreEthers = new SemaphoreEthers(NOVA_RPC_URL, {
+        address: semaphoreAddress,
+        startBlock: deployedBlockNumber.toNumber(),
+    });
+
     // get the group ID
-    const groupId = await didRegistryContract.groupId();
+    const groupId: BigNumberish = await didRegistryContract.groupId();
 
     // sample user commitment for testing
     let user = new Identity();
@@ -83,7 +87,7 @@ async function main() {
     // b. check if the user commitment is present in the group
     let isMember = members.includes(identityCommitment.toString());
 
-    console.log(`Is user ${identityCommitment} in group? ${isMember}`);
+    console.log(`Is user with \'${identityCommitment}\' in group? ${isMember}`);
 }
 
 main().catch((error) => {

@@ -4,7 +4,11 @@
 import { ethers } from "hardhat";
 import { Wallet, Contract, BigNumberish, BigNumber } from "ethers";
 import { DidRegistry } from "../build/typechain";
-import { isContractAddress, readContractAddresses } from "./utils";
+import {
+    isContractAddress,
+    readContractAddresses,
+    readDidRegistry,
+} from "./utils";
 import { formatBytes32String } from "ethers/lib/utils";
 import { config } from "../package.json";
 import { now } from "../scripts/utils";
@@ -117,8 +121,7 @@ async function main() {
 
     // after running `$ yarn hardhat deploy --network nova`, you can get the DID Registry address
     // from "../deployed-subspace-nova.json".
-    const didRegistryAddress: string =
-        readContractAddresses(CONFIG_FILE_PATH).DidRegistry;
+    const didRegistryAddress: string = readDidRegistry(CONFIG_FILE_PATH)[0];
 
     // client
     const provider = new ethers.providers.JsonRpcProvider(NOVA_RPC_URL);
