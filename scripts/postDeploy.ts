@@ -9,6 +9,8 @@ import { isContractAddress, readDidRegistry } from "./utils";
 
 // Import the DidRegistry ABI from the JSON file
 import DidRegistryJson from "../build/contracts/contracts/DidRegistry.sol/DidRegistry.json";
+import { assert } from "chai";
+import { DidRegistry } from "../build/typechain";
 const abi = DidRegistryJson.abi;
 
 const NOVA_RPC_URL = process.env.NOVA_RPC_URL;
@@ -60,14 +62,14 @@ async function main() {
 
     // instantiate the DID Registry contract instance via the address & provider
     // contract instance
-    const didRegistryContract: Contract = new ethers.Contract(
+    const didRegistryContract: DidRegistry = new ethers.Contract(
         didRegistryAddress,
         abi,
         provider
-    );
+    ) as DidRegistry;
 
     // to be called once by admin
-    if ((await didRegistryContract.deployedBlockNumber()) !== 0) {
+    if ((await didRegistryContract.deployedBlockNumber()).toNumber() !== 0) {
         throw new Error(
             `The deployed block num is already set by the admin of the contract`
         );

@@ -2,11 +2,12 @@
  * This script gets the group ID of the DID Registry contract deployed on Nova
  */
 import { ethers } from "hardhat";
-import { Contract } from "ethers";
+import { BigNumber, Contract } from "ethers";
 import { isContractAddress, readDidRegistry } from "./utils";
 
 // Import the DidRegistry ABI from the JSON file
 import DidRegistryJson from "../build/contracts/contracts/DidRegistry.sol/DidRegistry.json";
+import { DidRegistry } from "../build/typechain";
 const abi = DidRegistryJson.abi;
 
 const NOVA_RPC_URL = process.env.NOVA_RPC_URL;
@@ -40,33 +41,34 @@ async function main() {
     }
 
     // contract instance
-    const didRegistryContract: Contract = new ethers.Contract(
+    const didRegistryContract: DidRegistry = new ethers.Contract(
         didRegistryAddress,
         abi,
         provider
-    );
+    ) as DidRegistry;
 
     // get the admin
     const admin: string = await didRegistryContract.admin();
     console.log(`Admin: ${admin}`);
 
     // call the groupId getter function
-    const groupId: bigint = await didRegistryContract.groupId();
+    const groupId: BigNumber = await didRegistryContract.groupId();
     console.log(`Group ID: ${groupId}`);
 
     // get the block number when the contract was deployed
-    const blockNumber: bigint = await didRegistryContract.deployedBlockNumber();
+    const blockNumber: BigNumber =
+        await didRegistryContract.deployedBlockNumber();
     console.log(`Deployed Block number: ${blockNumber}`);
 
     // call the members getter function
-    const members: bigint = await didRegistryContract.getMembers();
+    const members: BigNumber = await didRegistryContract.getMembers();
     console.log(`Total members: ${members}`);
 
     // call the merkle root getter function
-    const merkleRoot: string = await didRegistryContract.getMerkleTreeRoot();
+    const merkleRoot: BigNumber = await didRegistryContract.getMerkleTreeRoot();
     console.log(`Merkle root: ${merkleRoot}`);
 
-    const mtDepth: bigint = await didRegistryContract.getMerkleTreeDepth();
+    const mtDepth: BigNumber = await didRegistryContract.getMerkleTreeDepth();
     console.log(`Merkle tree depth: ${mtDepth}`);
 }
 

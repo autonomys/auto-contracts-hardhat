@@ -83,11 +83,13 @@ contract DidRegistry {
             revert ZeroIdentityCommitment();
         }
 
+        uint256 userIndex = userCount;
+
         ++userCount;
 
         semaphore.addMember(groupId, identityCommitment);
 
-        emit DidAdded(userCount, identityCommitment);
+        emit DidAdded(userIndex, identityCommitment);
     }
 
     function verifyMembership(uint256 did, uint256 merkleTreeRoot, uint256 nullifierHash, uint256[8] calldata proof)

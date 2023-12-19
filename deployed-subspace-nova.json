@@ -1,11 +1,11 @@
 {
-    "Pairing": "0x73c22164fD9163dbaFbE41C3883C3F7c5E0D608D",
-    "SemaphoreVerifier": "0xA5DC69a0b538F884e8d40DECaD83dED9a287eb86",
-    "Poseidon": "0xFba0c2c999155C35219b2Ff480FB5DE5D8e39016",
-    "IncrementalBinaryTree": "0x081425788E6D9bb7a4E948F2c9C9C219664487ea",
-    "Semaphore": "0x147cA54F5fb910847498A7B37cc9Bd8298B44631",
+    "Pairing": "0x914FD48429dd6206cF55aa6Eb8cFF0D56a848b35",
+    "SemaphoreVerifier": "0xdDb8cd182448F7319Ac3D1243a5760f10F8E8569",
+    "Poseidon": "0x111AC1849304DF9E6E41C99fBa5d83F3a418b34A",
+    "IncrementalBinaryTree": "0x8913FBCaC3d5f6f45Ee2faC552efEaD640f82264",
+    "Semaphore": "0x2b23f57712Ee89e10f7c5940f8b960736675987b",
     "DidRegistry": {
-        "address": "0xb538C33db900081D0B40718cD50Ff54666C85470",
-        "txHash": "0x93a85886574867c805afcd50d67eb194e9cf216404b09243b3200802c0c5bbf6"
+        "address": "0x0cDE3A6F784AFd045E25226c9DaF0895f6Af20d1",
+        "txHash": "0x8c45d7f898910cb3e3ef75c6f9c7f323f2560cf0162dd6d8d694ed0ec351cb30"
     }
 }
