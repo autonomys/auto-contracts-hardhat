@@ -5,11 +5,12 @@
  *
  * Two approaches followed to check if the user is in the group [From Semaphore docs]:
  * FIXME: [SemaphoreSubgraph] This script is not working as expected. This is because the Semaphore subgraph
- *      may not be configured for Nova network.
+ *      may not be configured for Nova network. Also, there was no way to feed the Semaphore contract address
+ *     to the subgraph. So, it was not able to query the group members maybe.
  *      Solution: Use `SemaphoreEthers` instead of `SemaphoreSubgraph`.
  *
  * FIXME: [SemaphoreEthers] This script sometimes working, else throws error: "query timeout of 10 seconds exceeded".
- *          Solution: Increase the timeout.
+ *          Solution: Increase the timeout as last resort. As of now, it seems to be working.
  */
 
 import { SemaphoreSubgraph, SemaphoreEthers } from "@semaphore-protocol/data";
@@ -17,10 +18,10 @@ import { ethers } from "hardhat";
 import { readContractAddresses, readDidRegistry } from "./utils";
 import { Identity } from "@semaphore-protocol/identity";
 import { DidRegistry } from "../build/typechain";
+import { BigNumberish, BigNumber } from "ethers";
 
 // Import the DidRegistry ABI from the JSON file
 import DidRegistryJson from "../build/contracts/contracts/DidRegistry.sol/DidRegistry.json";
-import { BigNumberish } from "ethers";
 const abi = DidRegistryJson.abi;
 
 const NOVA_RPC_URL = process.env.NOVA_RPC_URL;
@@ -36,6 +37,79 @@ function validateEnv() {
     }
 }
 
+async function queryDidAddedEventLogs(
+    didRegistryContract: DidRegistry,
+    deployedBlockNumber: BigNumber
+): Promise<Array<BigNumber>> {
+    let userCommitments: Array<BigNumber> = [];
+    try {
+        // Query the event data
+        const filter = didRegistryContract.filters.DidAdded();
+        const events = await didRegistryContract.queryFilter(
+            filter,
+            deployedBlockNumber.toNumber()
+        );
+
+        // Process the event data
+        events.forEach((event) => {
+            userCommitments.push(event.args.identityCommitment);
+        });
+
+        return userCommitments;
+    } catch (error) {
+        throw new Error(`Error querying 'DidAdded' event: ${error}`);
+    }
+}
+
+// Approach-1
+// Using `SemaphoreSubgraph`
+// Doc: https://www.notion.so/subspacelabs/Semaphore-61b59172253b4bc88872a8559aafb0ba?pvs=4#fc2880da2cb14d0bb8501f15e793f42d
+async function approach1(
+    groupId: BigNumber,
+    identityCommitment: bigint
+): Promise<boolean> {
+    const semaphoreSubgraph = new SemaphoreSubgraph(
+        "https://nova.squid.gemini-3g.subspace.network/graphql"
+    );
+    // using `SemaphoreSubgraph`
+    return await semaphoreSubgraph.isGroupMember(
+        groupId.toString(),
+        identityCommitment.toString()
+    );
+}
+
+// Approach-2
+// Using `SemaphoreEthers`
+// Doc: https://www.notion.so/subspacelabs/Semaphore-61b59172253b4bc88872a8559aafb0ba?pvs=4#1adf19a47b3045d782f6f5d1a5122f7d
+async function approach2(
+    semaphoreAddress: string,
+    deployedBlockNumber: BigNumber,
+    groupId: BigNumber,
+    identityCommitment: bigint
+): Promise<boolean> {
+    // using `SemaphoreEthers`
+    const semaphoreEthers = new SemaphoreEthers(NOVA_RPC_URL, {
+        address: semaphoreAddress,
+        startBlock: deployedBlockNumber.toNumber(),
+    });
+    // a. get the group members
+    const members = await semaphoreEthers.getGroupMembers(groupId.toString());
+    // b. check if the user commitment is present in the group
+    return members.includes(identityCommitment.toString());
+}
+
+async function approach3(
+    didRegistryContract: DidRegistry,
+    deployedBlockNumber: BigNumber,
+    identityCommitment: bigint
+): Promise<boolean> {
+    // Using query of 'DidAdded' event logs
+    const members = (
+        await queryDidAddedEventLogs(didRegistryContract, deployedBlockNumber)
+    ).map((member) => member.toString());
+    return members.includes(identityCommitment.toString());
+}
+
 async function main() {
     validateEnv();
 
@@ -48,11 +122,6 @@ async function main() {
     // client
     const provider = new ethers.providers.JsonRpcProvider(NOVA_RPC_URL);
 
-    // Using `SemaphoreSubgraph`
-    // const semaphoreSubgraph = new SemaphoreSubgraph(
-    //     "https://nova.squid.gemini-3g.subspace.network/graphql"
-    // );
-
     const didRegistryContract: DidRegistry = new ethers.Contract(
         didRegistryAddress,
         abi,
@@ -62,30 +131,30 @@ async function main() {
     // get the deployedBlockNumber from the contract
     const deployedBlockNumber = await didRegistryContract.deployedBlockNumber();
 
-    // Using `SemaphoreEthers`
-    const semaphoreEthers = new SemaphoreEthers(NOVA_RPC_URL, {
-        address: semaphoreAddress,
-        startBlock: deployedBlockNumber.toNumber(),
-    });
-
     // get the group ID
     const groupId: BigNumberish = await didRegistryContract.groupId();
 
     // sample user commitment for testing
-    let user = new Identity();
+    const user = new Identity();
     const identityCommitment = user.commitment;
 
-    // using `SemaphoreSubgraph`
-    // let isMember = await semaphoreSubgraph.isGroupMember(
-    //     groupId.toString(),
-    //     identityCommitment.toString()
+    // Approach-1: ❌ (Request failed with status code 400)
+    // const isMember = await approach1(groupId, identityCommitment);
+
+    // Approach-2: ✅ 14s (takes more time than Approach-3)
+    // const isMember = await approach2(
+    //     semaphoreAddress,
+    //     deployedBlockNumber,
+    //     groupId,
+    //     identityCommitment
     // );
 
-    // using `SemaphoreEthers`
-    // a. get the group members
-    const members = await semaphoreEthers.getGroupMembers(groupId.toString());
-    // b. check if the user commitment is present in the group
-    let isMember = members.includes(identityCommitment.toString());
+    // Approach-3: ✅ 8s
+    const isMember = await approach3(
+        didRegistryContract,
+        deployedBlockNumber,
+        identityCommitment
+    );
 
     console.log(`Is user with \'${identityCommitment}\' in group? ${isMember}`);
 }
