@@ -66,6 +66,13 @@ async function main() {
         provider
     );
 
+    // to be called once by admin
+    if ((await didRegistryContract.deployedBlockNumber()) !== 0) {
+        throw new Error(
+            `The deployed block num is already set by the admin of the contract`
+        );
+    }
+
     // tx receipt
     const receipt = await provider.getTransactionReceipt(txHash);
 

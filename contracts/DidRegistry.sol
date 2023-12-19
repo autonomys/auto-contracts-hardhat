@@ -28,10 +28,16 @@ contract DidRegistry {
     error ZeroIdentityCommitment();
     error EitherZeroDidRootNullifierHash();
     error ZeroProof();
+    error DepBlockNumAlreadySet();
+    error ZeroGroupId();
 
     constructor(address semaphoreAddress, uint256 _groupId) {
         if (semaphoreAddress == address(0)) {
             revert ZeroAddress();
+        }
+
+        if (_groupId == 0) {
+            revert ZeroGroupId();
         }
 
         semaphore = IDidRegistry(semaphoreAddress);
@@ -64,8 +70,11 @@ contract DidRegistry {
     // ======== Setters =========
 
     /// @dev Set the deployedBlockNumber to the block number from which
-    /// the events should be queried.
+    /// the events should be queried. It should only be called once.
     function setDeployedBlockNumber(uint256 _deployedBlockNumber) external onlyAdmin {
+        if (deployedBlockNumber != 0) {
+            revert DepBlockNumAlreadySet();
+        }
         deployedBlockNumber = _deployedBlockNumber;
     }
 
