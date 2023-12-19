@@ -72,7 +72,9 @@ async function main() {
     console.log(`Merkle tree depth: ${mtDepth}`);
 }
 
-main().catch((error) => {
-    console.error(`An error occurred: ${error}`);
-    process.exit(1);
-});
+main()
+    .then(() => process.exit(0))
+    .catch((error) => {
+        console.error(`An error occurred: ${error}`);
+        process.exit(1);
+    });

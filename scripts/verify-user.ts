@@ -18,7 +18,7 @@
  *
  */
 import { ethers } from "hardhat";
-import { Wallet, Contract, BigNumberish, BigNumber } from "ethers";
+import { Wallet, BigNumberish, BigNumber } from "ethers";
 import { DidRegistry } from "../build/typechain";
 import { isContractAddress, readDidRegistry } from "./utils";
 import { formatBytes32String } from "ethers/lib/utils";
@@ -31,6 +31,7 @@ import { debug } from "debug";
 
 // Import the DidRegistry ABI from the JSON file
 import DidRegistryJson from "../build/contracts/contracts/DidRegistry.sol/DidRegistry.json";
+import assert from "assert";
 const abi = DidRegistryJson.abi;
 
 const NOVA_RPC_URL = process.env.NOVA_RPC_URL;
@@ -78,11 +79,6 @@ async function queryDidAddedEventLogs(
 
         // Process the event data
         events.forEach((event) => {
-            console.log(`Index: ${event.args.index}`);
-            console.log(
-                `Identity Commitment: ${event.args.identityCommitment}`
-            );
-
             userCommitments.push(event.args.identityCommitment);
         });
 
@@ -94,7 +90,7 @@ async function queryDidAddedEventLogs(
 
 // create a group forming a tree with all the users including the new user
 async function formGroup(
-    didRegistryContract: Contract,
+    didRegistryContract: DidRegistry,
     newUser: Identity
 ): Promise<Group> {
     try {
@@ -110,16 +106,31 @@ async function formGroup(
             didRegistryContract as DidRegistry
         );
 
-        // add the new user to the array
+        // Although the new user is added to the group on-chain before this step.
+        // But, it is not included in the event logs. So, we need to add it manually.
+        // NOTE: Plausible reason: May be the block is not finalized. So, the event logs doesn't include the new user.
         userCommitments.push(newUser.commitment);
 
+        // log the users commitment array including the new user
+        console.log("[");
+
         // add the users (commitment) to the group
-        for (const uc in userCommitments) {
-            group.addMember(uc);
-        }
+        userCommitments.forEach((uc) => {
+            console.log(`  ${uc}`);
+            group.addMember(uc.toString());
+        });
+        console.log("]");
+
+        // CLEANUP: Remove later.
+        // NOTE: It has been observed that when querying the event logs, sometimes the new user is not included.
+        // That's why this assertion:
+        // assert.strictEqual(
+        //     group.members.length,
+        //     (await didRegistryContract.getMembers()).toNumber(),
+        //     "Actual members in the group is not equal to the expected members because the event logs query failed to include the new user. Please try verifying the latest user after 10s maybe."
+        // );
 
         // total members in the group
-        // NOTE: Both `group.members.length` & `userCommitments.length` returns same.
         console.log(
             "Total members in the group (including the NEW one): ",
             group.members.length
@@ -159,11 +170,11 @@ async function main() {
 
     dbg(`Signer address: ${signer.address}`);
     // contract instance
-    const didRegistryContract: Contract = new ethers.Contract(
+    const didRegistryContract: DidRegistry = new ethers.Contract(
         didRegistryAddress,
         abi,
         provider
-    );
+    ) as DidRegistry;
 
     dbg(`DID Registry address: ${didRegistryContract.address}`);
 
@@ -194,7 +205,7 @@ async function main() {
     const group = await formGroup(didRegistryContract, newUser);
 
     // as external nullifier
-    const groupId = await didRegistryContract.groupId();
+    // const groupId = await didRegistryContract.groupId();
 
     const fullProof = await generateProof(
         newUser,
@@ -207,19 +218,25 @@ async function main() {
         }
     );
 
+    dbg(`Sending tx to verify the new user...`);
+
     // signer sends tx to verify the new user
+    // FIXME: It fails with 'failed' status. But, the tx is successful.
     const tx2 = await didRegistryContract
         .connect(signer)
         .verifyMembership(
             signal,
             fullProof.merkleTreeRoot,
             fullProof.nullifierHash,
-            fullProof.proof
+            fullProof.proof,
+            { gasLimit: 2000000 }
         );
     console.log(`Transaction hash for verifying the new user: ${tx2.hash}`);
 }
 
-main().catch((error) => {
-    console.error(`An error occurred: ${error}`);
-    process.exit(1);
-});
+main()
+    .then(() => process.exit(0))
+    .catch((error) => {
+        console.error(`An error occurred: ${error}`);
+        process.exit(1);
+    });
