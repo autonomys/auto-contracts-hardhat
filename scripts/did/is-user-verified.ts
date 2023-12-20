@@ -71,7 +71,7 @@ async function approach1(
     identityCommitment: bigint
 ): Promise<boolean> {
     const semaphoreSubgraph = new SemaphoreSubgraph(
-        "https://nova.squid.gemini-3g.subspace.network/graphql"
+        "https://subgraph.satsuma-prod.com/c74ef9357a5b/subspace/semaphore-test/version/v0.0.1-new-version/api"
     );
     // using `SemaphoreSubgraph`
     return await semaphoreSubgraph.isGroupMember(
