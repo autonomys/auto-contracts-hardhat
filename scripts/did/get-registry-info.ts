@@ -6,8 +6,8 @@ import { BigNumber, Contract } from "ethers";
 import { isContractAddress, readDidRegistry } from "./utils";
 
 // Import the DidRegistry ABI from the JSON file
-import DidRegistryJson from "../build/contracts/contracts/DidRegistry.sol/DidRegistry.json";
-import { DidRegistry } from "../build/typechain";
+import DidRegistryJson from "../../build/contracts/contracts/DidRegistry.sol/DidRegistry.json";
+import { DidRegistry } from "../../build/typechain";
 const abi = DidRegistryJson.abi;
 
 const NOVA_RPC_URL = process.env.NOVA_RPC_URL;

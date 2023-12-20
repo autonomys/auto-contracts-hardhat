@@ -3,6 +3,8 @@
  * The script runs the check off-chain. Just collecting some info from the Nova chain.
  * So, no gas fees for this.
  *
+ * Usage: In order to use any Auto Product, one can use this script to check if the caller is a verified user.
+ *
  * Two approaches followed to check if the user is in the group [From Semaphore docs]:
  * FIXME: [SemaphoreSubgraph] This script is not working as expected. This is because the Semaphore subgraph
  *      may not be configured for Nova network. Also, there was no way to feed the Semaphore contract address
@@ -17,11 +19,11 @@ import { SemaphoreSubgraph, SemaphoreEthers } from "@semaphore-protocol/data";
 import { ethers } from "hardhat";
 import { readContractAddresses, readDidRegistry } from "./utils";
 import { Identity } from "@semaphore-protocol/identity";
-import { DidRegistry } from "../build/typechain";
+import { DidRegistry } from "../../build/typechain";
 import { BigNumberish, BigNumber } from "ethers";
 
 // Import the DidRegistry ABI from the JSON file
-import DidRegistryJson from "../build/contracts/contracts/DidRegistry.sol/DidRegistry.json";
+import DidRegistryJson from "../../build/contracts/contracts/DidRegistry.sol/DidRegistry.json";
 const abi = DidRegistryJson.abi;
 
 const NOVA_RPC_URL = process.env.NOVA_RPC_URL;

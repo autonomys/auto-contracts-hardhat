@@ -19,18 +19,18 @@
  */
 import { ethers } from "hardhat";
 import { Wallet, BigNumberish, BigNumber } from "ethers";
-import { DidRegistry } from "../build/typechain";
+import { DidRegistry } from "../../build/typechain";
 import { isContractAddress, readDidRegistry } from "./utils";
 import { formatBytes32String } from "ethers/lib/utils";
-import { config } from "../package.json";
-import { now } from "../scripts/utils";
+import { config } from "../../package.json";
+import { now } from "./utils";
 import { Identity } from "@semaphore-protocol/identity";
 import { generateProof } from "@semaphore-protocol/proof";
 import { Group } from "@semaphore-protocol/group";
 import { debug } from "debug";
 
 // Import the DidRegistry ABI from the JSON file
-import DidRegistryJson from "../build/contracts/contracts/DidRegistry.sol/DidRegistry.json";
+import DidRegistryJson from "../../build/contracts/contracts/DidRegistry.sol/DidRegistry.json";
 import assert from "assert";
 const abi = DidRegistryJson.abi;
 

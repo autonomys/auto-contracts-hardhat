@@ -1,27 +1,16 @@
 /**
- * Add a user to a group on Nova using the DID Registry contract
- * Sample tx: {
- *   "0": {
- *     hash: 0x0cc896bb9b76a560d5cd9c2dbbeff02a8d74976f6619a6a9e1b3d946ed756f2b,
- *     gas: 1,679,962,
- *   }
- *   "1": {
- *     hash: 0xa9e6a1f635a411ec5ee7d00fdd2baf29e4bdd96ac3d9250fc050500cf0c1c611,
- *     gas: 903,012,
- *   }
- * }
- *
- * The first tx was costly because it was first used to initialize the corresponding storage like merkleroot.
- * Basically, the 1st member of the group is inserted.
- * Next time onwards, it will be around 900k.
+ * This script is executed after the deployment of DID Registry is completed.
+ * Sample tx: https://nova.subspace.network/tx/0x5c177353d872c1b6792bb139e76c4eec366763813987db480ec7b6ce2a4460f6
  */
+
 import { ethers } from "hardhat";
 import { Wallet, Contract } from "ethers";
 import { isContractAddress, readDidRegistry } from "./utils";
 
 // Import the DidRegistry ABI from the JSON file
-import DidRegistryJson from "../build/contracts/contracts/DidRegistry.sol/DidRegistry.json";
-import { Identity } from "@semaphore-protocol/identity";
+import DidRegistryJson from "../../build/contracts/contracts/DidRegistry.sol/DidRegistry.json";
+import { assert } from "chai";
+import { DidRegistry } from "../../build/typechain";
 const abi = DidRegistryJson.abi;
 
 const NOVA_RPC_URL = process.env.NOVA_RPC_URL;
@@ -56,7 +45,7 @@ async function main() {
 
     // after running `$ yarn hardhat deploy --network nova`, you can get the DID Registry address
     // from "../deployed-subspace-nova.json".
-    const didRegistryAddress: string = readDidRegistry(CONFIG_FILE_PATH)[0];
+    const [didRegistryAddress, txHash] = readDidRegistry(CONFIG_FILE_PATH);
 
     // client
     const provider = new ethers.providers.JsonRpcProvider(NOVA_RPC_URL);
@@ -73,20 +62,32 @@ async function main() {
 
     // instantiate the DID Registry contract instance via the address & provider
     // contract instance
-    const didRegistryContract: Contract = new ethers.Contract(
+    const didRegistryContract: DidRegistry = new ethers.Contract(
         didRegistryAddress,
         abi,
         provider
-    );
+    ) as DidRegistry;
 
-    // create a new user & get the identity commitment
-    const user = new Identity();
+    // to be called once by admin
+    if ((await didRegistryContract.deployedBlockNumber()).toNumber() !== 0) {
+        throw new Error(
+            `The deployed block num is already set by the admin of the contract`
+        );
+    }
+
+    // tx receipt
+    const receipt = await provider.getTransactionReceipt(txHash);
+
+    // block number to start query from
+    const blockNum = receipt.blockNumber;
 
     // send the transaction to add the user to the group
-    const tx = await didRegistryContract
+    const tx2 = await didRegistryContract
         .connect(signer)
-        .addToGroup(user.commitment);
-    console.log(`Transaction hash for adding a new user to group: ${tx.hash}`);
+        .setDeployedBlockNumber(blockNum);
+    console.log(
+        `Transaction hash for setting query from block number ${blockNum}: ${tx2.hash}`
+    );
 }
 
 main()

@@ -44,11 +44,11 @@ cp .env.example .env
 3. And deploy your contract.
 
 ```bash
-yarn deploy --semaphore <semaphore-address> --group <group-id> --network nova
+yarn deploy-nova
 ```
 
 > **Note**  
-> Check the Semaphore contract addresses [here](https://semaphore.pse.dev/docs/deployed-contracts#semaphore) for the supported EVM networks. If you want to deploy the Semaphore contract into your own preferred EVM network, you can do it by `$ yarn deploy --network nova`.
+> Check the Semaphore contract addresses [here](https://semaphore.pse.dev/docs/deployed-contracts#semaphore) for the supported EVM networks. If you want to deploy the Semaphore contract into your own preferred EVM network, you can do it by `$ yarn deploy --network <network-name>`.
 
 > **Warning**  
 > The group id is a number!
@@ -58,4 +58,6 @@ Or deploy contract with a new Semaphore contract.
 
 ```bash
 yarn deploy-nova
+# set the deployed block number for event query from
+yarn post-deploy-nova
 ```

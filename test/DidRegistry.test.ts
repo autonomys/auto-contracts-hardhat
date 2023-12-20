@@ -7,7 +7,7 @@ import { run } from "hardhat";
 // @ts-ignore: typechain folder will be generated after contracts compilation
 import { DidRegistry } from "../build/typechain";
 import { config } from "../package.json";
-import { now } from "../scripts/utils";
+import { now } from "../scripts/did/utils";
 
 describe("DidRegistry", () => {
     let didContract: DidRegistry;
