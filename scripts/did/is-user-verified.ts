@@ -71,7 +71,7 @@ async function approach1(
     identityCommitment: bigint
 ): Promise<boolean> {
     const semaphoreSubgraph = new SemaphoreSubgraph(
-        "https://nova.squid.gemini-3g.subspace.network/graphql"
+        "https://subgraph.satsuma-prod.com/c74ef9357a5b/subspace/semaphore-test/version/v0.0.1-new-version/api"
     );
     // using `SemaphoreSubgraph`
     return await semaphoreSubgraph.isGroupMember(
@@ -141,7 +141,7 @@ async function main() {
     const identityCommitment = user.commitment;
 
     // Approach-1: ❌ (Request failed with status code 400)
-    // const isMember = await approach1(groupId, identityCommitment);
+    const isMember = await approach1(groupId, identityCommitment);
 
     // Approach-2: ✅ 14s (takes more time than Approach-3)
     // const isMember = await approach2(
@@ -152,11 +152,11 @@ async function main() {
     // );
 
     // Approach-3: ✅ 8s
-    const isMember = await approach3(
-        didRegistryContract,
-        deployedBlockNumber,
-        identityCommitment
-    );
+    // const isMember = await approach3(
+    //     didRegistryContract,
+    //     deployedBlockNumber,
+    //     identityCommitment
+    // );
 
     console.log(`Is user with \'${identityCommitment}\' in group? ${isMember}`);
 }
