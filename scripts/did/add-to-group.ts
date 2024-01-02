@@ -86,6 +86,10 @@ async function main() {
     const tx = await didRegistryContract
         .connect(signer)
         .addToGroup(user.commitment);
+
+    // wait for the transaction to be mined
+    await tx.wait();
+
     console.log(`Transaction hash for adding a new user to group: ${tx.hash}`);
 }
 

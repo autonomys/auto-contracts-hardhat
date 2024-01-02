@@ -81,12 +81,16 @@ async function main() {
     // block number to start query from
     const blockNum = receipt.blockNumber;
 
-    // send the transaction to add the user to the group
-    const tx2 = await didRegistryContract
+    // send the transaction to set the deployed block number
+    const tx = await didRegistryContract
         .connect(signer)
         .setDeployedBlockNumber(blockNum);
+
+    // wait for the transaction to be mined
+    await tx.wait();
+
     console.log(
-        `Transaction hash for setting query from block number ${blockNum}: ${tx2.hash}`
+        `Transaction hash for setting query from block number ${blockNum}: ${tx.hash}`
     );
 }
 
