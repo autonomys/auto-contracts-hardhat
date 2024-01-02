@@ -187,6 +187,10 @@ async function main() {
     const tx1 = await didRegistryContract
         .connect(signer)
         .addToGroup(newUser.commitment);
+
+    // wait for the transaction to be mined
+    await tx1.wait();
+
     console.log(`Transaction hash for adding a new user to group: ${tx1.hash}`);
 
     console.log(`Identity Commitment (NEW): ${newUser.commitment}`);
@@ -231,6 +235,10 @@ async function main() {
             fullProof.proof,
             { gasLimit: 2000000 }
         );
+
+    // wait for the transaction to be mined
+    await tx2.wait();
+
     console.log(`Transaction hash for verifying the new user: ${tx2.hash}`);
 }
 
