@@ -20,7 +20,7 @@ import { ethers } from "hardhat";
 import { readContractAddresses, readDidRegistry } from "./utils";
 import { Identity } from "@semaphore-protocol/identity";
 import { DidRegistry } from "../../build/typechain";
-import { BigNumberish, BigNumber } from "ethers";
+import { BigNumberish, BigNumber, Contract } from "ethers";
 
 // Import the DidRegistry ABI from the JSON file
 import DidRegistryJson from "../../build/contracts/contracts/DidRegistry.sol/DidRegistry.json";
@@ -67,7 +67,7 @@ async function queryDidAddedEventLogs(
 // Using `SemaphoreSubgraph`
 // Doc: https://www.notion.so/subspacelabs/Semaphore-61b59172253b4bc88872a8559aafb0ba?pvs=4#fc2880da2cb14d0bb8501f15e793f42d
 async function approach1(
-    groupId: BigNumber,
+    groupId: BigNumberish,
     identityCommitment: bigint
 ): Promise<boolean> {
     const semaphoreSubgraph = new SemaphoreSubgraph(
@@ -86,7 +86,7 @@ async function approach1(
 async function approach2(
     semaphoreAddress: string,
     deployedBlockNumber: BigNumber,
-    groupId: BigNumber,
+    groupId: BigNumberish,
     identityCommitment: bigint
 ): Promise<boolean> {
     // using `SemaphoreEthers`
@@ -118,20 +118,15 @@ async function main() {
     // after running `$ yarn hardhat deploy --network nova`, you can get the DID Registry address
     // from "../deployed-subspace-nova.json".
     const didRegistryAddress: string = readDidRegistry(CONFIG_FILE_PATH)[0];
-    const semaphoreAddress: string =
-        readContractAddresses(CONFIG_FILE_PATH).Semaphore;
 
     // client
     const provider = new ethers.providers.JsonRpcProvider(NOVA_RPC_URL);
 
-    const didRegistryContract: DidRegistry = new ethers.Contract(
+    const didRegistryContract: Contract = new ethers.Contract(
         didRegistryAddress,
         abi,
         provider
-    ) as DidRegistry;
-
-    // get the deployedBlockNumber from the contract
-    const deployedBlockNumber = await didRegistryContract.deployedBlockNumber();
+    );
 
     // get the group ID
     const groupId: BigNumberish = await didRegistryContract.groupId();
@@ -140,10 +135,19 @@ async function main() {
     const user = new Identity();
     const identityCommitment = user.commitment;
 
-    // Approach-1: ❌ (Request failed with status code 400)
+    // Approach-1: ✅ 6s
+    // Currently, fetching from event logs - `MemberAdded` of Semaphore contract.
+    // TODO: Need to update the subgraph url to fetch from the event logs of DidRegistry contract - `DidAdded` event.
+    // Issue: https://github.com/subspace/auto-contracts-hardhat/issues/2
     const isMember = await approach1(groupId, identityCommitment);
 
+    // get the deployedBlockNumber from the contract
+    const deployedBlockNumber = await didRegistryContract.deployedBlockNumber();
+
     // Approach-2: ✅ 14s (takes more time than Approach-3)
+    // const semaphoreAddress: string =
+    //     readContractAddresses(CONFIG_FILE_PATH).Semaphore;
+
     // const isMember = await approach2(
     //     semaphoreAddress,
     //     deployedBlockNumber,

@@ -34,7 +34,8 @@
         "get-registry-info": "hardhat run scripts/did/get-registry-info.ts",
         "add-to-group": "hardhat run scripts/did/add-to-group.ts",
         "verify-user": "hardhat run scripts/did/verify-user.ts",
-        "is-user-verified": "hardhat run scripts/did/is-user-verified.ts"
+        "is-user-verified": "hardhat run scripts/did/is-user-verified.ts",
+        "pay": "hardhat run scripts/payment/pay.ts"
     },
     "devDependencies": {
         "@ethersproject/abi": "^5.4.7",
