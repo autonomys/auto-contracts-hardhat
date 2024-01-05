@@ -33,10 +33,10 @@ describe("DidRegistry", () => {
         users.push(new Identity());
     });
 
-    describe("# addToGroup", () => {
+    describe("# register", () => {
         it("Should allow users to join the group", async () => {
             for await (const [i, user] of users.entries()) {
-                const transaction = didContract.addToGroup(user.commitment);
+                const transaction = didContract.register(user.commitment);
 
                 group.addMember(user.commitment);
 

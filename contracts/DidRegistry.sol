@@ -78,7 +78,7 @@ contract DidRegistry {
         deployedBlockNumber = _deployedBlockNumber;
     }
 
-    function addToGroup(uint256 identityCommitment) external {
+    function register(uint256 identityCommitment) external {
         if (identityCommitment == 0) {
             revert ZeroIdentityCommitment();
         }
