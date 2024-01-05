@@ -1,5 +1,5 @@
 /**
- * Pay module
+ * Pay on Nova chain
  */
 
 import { ethers, BigNumber } from "ethers";
