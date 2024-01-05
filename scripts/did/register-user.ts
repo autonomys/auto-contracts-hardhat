@@ -1,12 +1,12 @@
 /**
- * Add a user to a group on Nova using the DID Registry contract
+ * Add/Register a user to a group on Nova using the DID Registry contract
  * Sample tx: {
  *   "0": {
- *     hash: 0x0cc896bb9b76a560d5cd9c2dbbeff02a8d74976f6619a6a9e1b3d946ed756f2b,
+ *     hash: 0x8e61408f673e00e9d1c85607000ff9a6520886516de255ef1a7be3a9ad7292e6,
  *     gas: 1,679,962,
  *   }
  *   "1": {
- *     hash: 0xa9e6a1f635a411ec5ee7d00fdd2baf29e4bdd96ac3d9250fc050500cf0c1c611,
+ *     hash: 0xd7c753be8c70fab590a9b2684f16d107fa15dd63d66fca5308d8f39b4da1bd22,
  *     gas: 903,012,
  *   }
  * }
@@ -17,7 +17,12 @@
  */
 import { ethers } from "hardhat";
 import { Wallet, Contract } from "ethers";
-import { isContractAddress, readDidRegistry } from "./utils";
+import {
+    isContractAddress,
+    readDidRegistry,
+    checkBalance,
+    validateEnv,
+} from "./utils";
 import { Identity } from "@semaphore-protocol/identity";
 
 // Import the DidRegistry ABI from the JSON file
@@ -28,28 +33,6 @@ const NOVA_RPC_URL = process.env.NOVA_RPC_URL;
 const SIGNER_PRIVATE_KEY = process.env.SIGNER_PRIVATE_KEY;
 // Configurable file path for the deployed contract address
 const CONFIG_FILE_PATH = "./deployed-subspace-nova.json"; // Configurable file path
-const MIN_BALANCE_SIGNER = "0.01";
-
-function validateEnv() {
-    if (!SIGNER_PRIVATE_KEY || !NOVA_RPC_URL) {
-        throw new Error(
-            "SIGNER_PRIVATE_KEY and NOVA_RPC_URL must be set in the .env file"
-        );
-    }
-}
-
-async function checkBalance(signer: Wallet) {
-    // check if sufficient balance is available
-    if (
-        (await signer.getBalance()).lt(
-            ethers.utils.parseEther(MIN_BALANCE_SIGNER)
-        )
-    ) {
-        throw new Error(
-            `The address ${signer.address} does not have sufficient balance to send transactions`
-        );
-    }
-}
 
 async function main() {
     validateEnv();
@@ -69,7 +52,7 @@ async function main() {
     }
 
     const signer: Wallet = new Wallet(`0x${SIGNER_PRIVATE_KEY}`, provider);
-    await checkBalance(signer);
+    await checkBalance(signer, provider);
 
     // instantiate the DID Registry contract instance via the address & provider
     // contract instance
@@ -85,7 +68,7 @@ async function main() {
     // send the transaction to add the user to the group
     const tx = await didRegistryContract
         .connect(signer)
-        .addToGroup(user.commitment);
+        .register(user.commitment);
 
     // wait for the transaction to be mined
     await tx.wait();

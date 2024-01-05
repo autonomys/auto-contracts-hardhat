@@ -2,8 +2,8 @@
  * This script gets the group ID of the DID Registry contract deployed on Nova
  */
 import { ethers } from "hardhat";
-import { BigNumber, Contract } from "ethers";
-import { isContractAddress, readDidRegistry } from "./utils";
+import { BigNumber } from "ethers";
+import { isContractAddress, readDidRegistry, validateEnv } from "./utils";
 
 // Import the DidRegistry ABI from the JSON file
 import DidRegistryJson from "../../build/contracts/contracts/DidRegistry.sol/DidRegistry.json";
@@ -11,17 +11,8 @@ import { DidRegistry } from "../../build/typechain";
 const abi = DidRegistryJson.abi;
 
 const NOVA_RPC_URL = process.env.NOVA_RPC_URL;
-const SIGNER_PRIVATE_KEY = process.env.SIGNER_PRIVATE_KEY;
 // Configurable file path for the deployed contract address
 const CONFIG_FILE_PATH = "./deployed-subspace-nova.json";
-
-function validateEnv() {
-    if (!SIGNER_PRIVATE_KEY || !NOVA_RPC_URL) {
-        throw new Error(
-            "SIGNER_PRIVATE_KEY and NOVA_RPC_URL must be set in the .env file"
-        );
-    }
-}
 
 async function main() {
     validateEnv();
