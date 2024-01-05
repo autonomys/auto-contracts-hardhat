@@ -1,7 +1,7 @@
 {
-    "name": "@auto/did-registry-hardhat",
-    "version": "3.15.1",
-    "description": "Auto DID Registry via Hardhat",
+    "name": "@auto/contracts-hardhat",
+    "version": "0.0.1",
+    "description": "Auto Contracts with Hardhat",
     "license": "MIT",
     "files": [
         "files.tgz",
@@ -23,19 +23,20 @@
         "clean:all": "rm -rf ./build && rm -rf ./cache && rm -rf ./coverage && rm -rf ./files.tgz && rm -rf ./node_modules",
         "compile": "hardhat compile",
         "download:snark-artifacts": "hardhat run scripts/download-snark-artifacts.ts",
-        "deploy": "yarn compile && hardhat deploy",
+        "deploy-local": "yarn compile && hardhat deploy",
         "deploy-nova": "yarn compile && hardhat deploy --network nova",
-        "post-deploy-nova": "yarn compile && hardhat run scripts/postDeploy.ts",
+        "deploy-nova-did": "yarn compile && hardhat deployDidRegistry --network nova",
+        "post-deploy-nova": "yarn compile && hardhat run scripts/did/postDeploy.ts",
         "test": "hardhat run scripts/download-snark-artifacts.ts && hardhat test",
         "test:report-gas": "REPORT_GAS=true hardhat test",
         "test:coverage": "hardhat coverage",
         "typechain": "hardhat typechain",
         "prepublish": "tar -czf files.tgz .gitignore",
         "get-registry-info": "hardhat run scripts/did/get-registry-info.ts",
-        "add-to-group": "hardhat run scripts/did/add-to-group.ts",
+        "register-user": "hardhat run scripts/did/register-user.ts",
         "verify-user": "hardhat run scripts/did/verify-user.ts",
         "is-user-verified": "hardhat run scripts/did/is-user-verified.ts",
-        "pay": "hardhat run scripts/payment/pay.ts"
+        "pay-nova": "hardhat run scripts/payment/payOnNova.ts"
     },
     "devDependencies": {
         "@ethersproject/abi": "^5.4.7",

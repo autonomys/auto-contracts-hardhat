@@ -1,29 +1,35 @@
 /**
- * Verify if user is in a group on Nova using the DID Registry contract
+ * Verify onchain, if a user is verified (i.e. present in a group) on the DID Registry contract deployed on Nova.
  *
- * To fetch the members (index, commitment) to form group from the Nova chain using `DidAdded` event logs,
- * we need to query the event logs from the block number when the contract was deployed.
- * We can get the block number when the contract was deployed using the `deployedBlockNumber` getter function.
- * `@semaphore-protocol/data` offers 2 ways to do this:
- *   1. Subgraph: `SemaphoreSubgraph` class
- *   2. RPC: `SemaphoreEthers` class
+ * To fetch the members (index, commitment) to form group from the `DidAdded` event logs on Nova chain,
+ * we need to query the event logs starting from the block number where the contract was deployed.
+ * We can get the block number when the contract was deployed using the `deployedBlockNumber` getter function
+ * of DID Registry contract.
  *
- * Both the techniques threw error when attempted in `is-user-verified.ts` script.
+ * Semaphore (`@semaphore-protocol/data`) offers 2 ways to fetch members from its `MemberAdded` event logs:
+ *   1. Subgraph: using `SemaphoreSubgraph` class
+ *   2. RPC: using `SemaphoreEthers` class
  *
- * The most optimized approach is to query a custom `DidAdded` event log of the DID Registry contract,
+ * NOTE: As per the `is-user-verified.ts` script, verification can be done offchain.
+ *
+ * The most optimized approach is to query a custom `DidAdded` event log of the DID Registry contract (meant for a single group),
  * which would return the list of users commitment. Using this we can form a group (tree) with all the members.
  * This approach is considered as optimized as this would only query the events of a single group instead of `MemberAdded`
  * event logs of all the groups, which is the case with `@semaphore-protocol/data` approach. This queries the event logs
- * from the block number when the Semaphore contract was deployed. This Semaphore contract can have multiple groups.
- *
+ * from the block number when the Semaphore contract was deployed. This Semaphore contract can have multiple groups openly.
  */
 import { ethers } from "hardhat";
 import { Wallet, BigNumberish, BigNumber } from "ethers";
 import { DidRegistry } from "../../build/typechain";
-import { isContractAddress, readDidRegistry } from "./utils";
+import {
+    isContractAddress,
+    readDidRegistry,
+    now,
+    checkBalance,
+    validateEnv,
+} from "./utils";
 import { formatBytes32String } from "ethers/lib/utils";
 import { config } from "../../package.json";
-import { now } from "./utils";
 import { Identity } from "@semaphore-protocol/identity";
 import { generateProof } from "@semaphore-protocol/proof";
 import { Group } from "@semaphore-protocol/group";
@@ -31,35 +37,12 @@ import { debug } from "debug";
 
 // Import the DidRegistry ABI from the JSON file
 import DidRegistryJson from "../../build/contracts/contracts/DidRegistry.sol/DidRegistry.json";
-import assert from "assert";
 const abi = DidRegistryJson.abi;
 
 const NOVA_RPC_URL = process.env.NOVA_RPC_URL;
 const SIGNER_PRIVATE_KEY = process.env.SIGNER_PRIVATE_KEY;
 // Configurable file path for the deployed contract address
 const CONFIG_FILE_PATH = "./deployed-subspace-nova.json";
-const MIN_BALANCE_SIGNER = "0.01";
-
-function validateEnv() {
-    if (!SIGNER_PRIVATE_KEY || !NOVA_RPC_URL) {
-        throw new Error(
-            "SIGNER_PRIVATE_KEY and NOVA_RPC_URL must be set in the .env file"
-        );
-    }
-}
-
-async function checkBalance(signer: Wallet) {
-    // check if sufficient balance is available
-    if (
-        (await signer.getBalance()).lt(
-            ethers.utils.parseEther(MIN_BALANCE_SIGNER)
-        )
-    ) {
-        throw new Error(
-            `The address ${signer.address} does not have sufficient balance to send transactions`
-        );
-    }
-}
 
 async function queryDidAddedEventLogs(
     didRegistryContract: DidRegistry
@@ -166,7 +149,7 @@ async function main() {
 
     // Get the signer & check if it has sufficient balance to send transactions
     const signer: Wallet = new Wallet(`0x${SIGNER_PRIVATE_KEY}`, provider);
-    await checkBalance(signer);
+    await checkBalance(signer, provider);
 
     dbg(`Signer address: ${signer.address}`);
     // contract instance
@@ -186,7 +169,7 @@ async function main() {
     // signer sends tx to add the new user to the group (tree)
     const tx1 = await didRegistryContract
         .connect(signer)
-        .addToGroup(newUser.commitment);
+        .register(newUser.commitment);
 
     // wait for the transaction to be mined
     await tx1.wait();

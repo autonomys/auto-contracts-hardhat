@@ -1,5 +1,5 @@
 /**
- * Is user in group created on-chain?
+ * Is user created in group on-chain?
  * The script runs the check off-chain. Just collecting some info from the Nova chain.
  * So, no gas fees for this.
  *
@@ -17,7 +17,7 @@
 
 import { SemaphoreSubgraph, SemaphoreEthers } from "@semaphore-protocol/data";
 import { ethers } from "hardhat";
-import { readContractAddresses, readDidRegistry } from "./utils";
+import { readContractAddresses, readDidRegistry, validateEnv } from "./utils";
 import { Identity } from "@semaphore-protocol/identity";
 import { DidRegistry } from "../../build/typechain";
 import { BigNumberish, BigNumber, Contract } from "ethers";
@@ -27,17 +27,8 @@ import DidRegistryJson from "../../build/contracts/contracts/DidRegistry.sol/Did
 const abi = DidRegistryJson.abi;
 
 const NOVA_RPC_URL = process.env.NOVA_RPC_URL;
-const SIGNER_PRIVATE_KEY = process.env.SIGNER_PRIVATE_KEY;
 // Configurable file path for the deployed contract address
 const CONFIG_FILE_PATH = "./deployed-subspace-nova.json";
-
-function validateEnv() {
-    if (!SIGNER_PRIVATE_KEY || !NOVA_RPC_URL) {
-        throw new Error(
-            "SIGNER_PRIVATE_KEY and NOVA_RPC_URL must be set in the .env file"
-        );
-    }
-}
 
 async function queryDidAddedEventLogs(
     didRegistryContract: DidRegistry,
@@ -135,7 +126,7 @@ async function main() {
     const user = new Identity();
     const identityCommitment = user.commitment;
 
-    // Approach-1: ✅ 6s
+    // Approach-1: ✅ 6-9s
     // Currently, fetching from event logs - `MemberAdded` of Semaphore contract.
     // TODO: Need to update the subgraph url to fetch from the event logs of DidRegistry contract - `DidAdded` event.
     // Issue: https://github.com/subspace/auto-contracts-hardhat/issues/2
@@ -162,7 +153,9 @@ async function main() {
     //     identityCommitment
     // );
 
-    console.log(`Is user with \'${identityCommitment}\' in group? ${isMember}`);
+    console.log(
+        `Is user with Auto ID: \'${identityCommitment}\' in group? ${isMember}`
+    );
 }
 
 main()

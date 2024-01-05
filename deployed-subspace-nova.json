@@ -1,11 +1,11 @@
 {
-    "Pairing": "0x914FD48429dd6206cF55aa6Eb8cFF0D56a848b35",
-    "SemaphoreVerifier": "0xdDb8cd182448F7319Ac3D1243a5760f10F8E8569",
-    "Poseidon": "0x111AC1849304DF9E6E41C99fBa5d83F3a418b34A",
-    "IncrementalBinaryTree": "0x8913FBCaC3d5f6f45Ee2faC552efEaD640f82264",
-    "Semaphore": "0x2b23f57712Ee89e10f7c5940f8b960736675987b",
+    "Pairing": "0x27bB264F0F47c6B7C4dF66720e641D5Dd27Dd0c0",
+    "SemaphoreVerifier": "0xe0810A8d579A833736e60Dd4dE8Db6Dce2d5213e",
+    "Poseidon": "0x75d67E637271F3e6ddefb0d1fa9E0B9B03562d2B",
+    "IncrementalBinaryTree": "0x1B8B148CEb4375D1DF20EE84bD56503a02e405Dc",
+    "Semaphore": "0x2f71e27Ab487583D79E20199c3b8633c71ef64b2",
     "DidRegistry": {
-        "address": "0x0cDE3A6F784AFd045E25226c9DaF0895f6Af20d1",
-        "txHash": "0x8c45d7f898910cb3e3ef75c6f9c7f323f2560cf0162dd6d8d694ed0ec351cb30"
+        "address": "0x1596BFd8023ED65C887Fffd35Fd9345776Ed4b22",
+        "txHash": "0x5d885d7af68806d5f57a207377de692016e8fd27c0cf231f34dea057a8ddbb88"
     }
 }
