@@ -9,6 +9,7 @@ import { NetworksUserConfig } from "hardhat/types";
 import "solidity-coverage";
 import { config } from "./package.json";
 import "./tasks/deploy";
+import "./tasks/deployDidRegistry";
 
 dotenvConfig();
 

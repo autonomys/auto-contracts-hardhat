@@ -1,6 +1,9 @@
 import { task, types } from "hardhat/config";
 
-task("deploy", "Deploy a DidRegistry contract")
+task(
+    "deploy",
+    "Deploy a DidRegistry contract with Semaphore Contract & Libraries"
+)
     .addOptionalParam(
         "semaphore",
         "Semaphore contract address",
