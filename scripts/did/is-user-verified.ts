@@ -34,7 +34,6 @@ async function queryDidAddedEventLogs(
     didRegistryContract: DidRegistry,
     deployedBlockNumber: BigNumber
 ): Promise<Array<BigNumber>> {
-    let userCommitments: Array<BigNumber> = [];
     try {
         // Query the event data
         const filter = didRegistryContract.filters.DidAdded();
@@ -44,9 +43,9 @@ async function queryDidAddedEventLogs(
         );
 
         // Process the event data
-        events.forEach((event) => {
-            userCommitments.push(event.args.identityCommitment);
-        });
+        const userCommitments: Array<BigNumber> = events.map(
+            (event) => event.args.identityCommitment
+        );
 
         return userCommitments;
     } catch (error) {
